@@ -1,13 +1,17 @@
 {
   "name": "messenger-bot",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "Facebook Messenger group bot with appstate login and command system",
+  "description": "Facebook Messenger group bot — Railway ready",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "postinstall": "node patches/apply.js"
   },
   "dependencies": {
     "ws3-fca": "^3.5.2"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
