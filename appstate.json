@@ -1,0 +1,151 @@
+[
+  {
+    "key": "dbln",
+    "value": "%7B%2261588947481528%22%3A%22H9j9u5e1%22%2C%2261589013958177%22%3A%225U7A4RBD%22%7D",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.925Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "datr",
+    "value": "KjPxaYoo9tp5R8-PYmojx08i",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.928Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "sb",
+    "value": "KjPxad6gB03aUTopgTfkJ_0b",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.928Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "locale",
+    "value": "en_US",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.928Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "ps_l",
+    "value": "1",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.928Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "ps_n",
+    "value": "1",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.928Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "dpr",
+    "value": "3",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.928Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "vpd",
+    "value": "v1%3B700x360x3",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.928Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "pas",
+    "value": "61588947481528%3AztbS0bbkqn%2C61563693022096%3AxgzfNn7XpO%2C61589013958177%3AHFgMVYzkSY",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.929Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "fr",
+    "value": "1JEqWkvNS0Hda6gtc.AWdW8dM6XQ3mSBIoUT3jdjt691e_S9GiexM7ZHUaTko14ALZz30.Bp8lRX..AAA.0.0.Bp-ISj.AWeGEOWM3Eh6-aAATT3PWLmY7Ls",
+    "expires": "2026-08-02T11:36:03.000Z",
+    "maxAge": 7776000,
+    "domain": "facebook.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true,
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.929Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z",
+    "sameSite": "none"
+  },
+  {
+    "key": "wl_cbv",
+    "value": "v2%3Bclient_version%3A3157%3Btimestamp%3A1777894076",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.929Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "m_pixel_ratio",
+    "value": "3",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.929Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "wd",
+    "value": "360x800",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.929Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "c_user",
+    "value": "61589013958177",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.929Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "xs",
+    "value": "43%3AT-7QYy22FGJfjg%3A2%3A1777894074%3A-1%3A-1",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.929Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  },
+  {
+    "key": "fbl_st",
+    "value": "100734688%3BT%3A29631567",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-05-04T11:36:02.929Z",
+    "lastAccessed": "2026-05-04T11:36:07.404Z"
+  }
+]
