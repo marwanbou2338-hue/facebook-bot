@@ -2,13 +2,10 @@
 builder = "NIXPACKS"
 
 [build.nixpacksPlan.phases.setup]
-nixPkgs = ["nodejs_20"]
+nixPkgs = ["nodejs_20", "npm-9_x"]
 
 [build.nixpacksPlan.phases.install]
-cmds = ["npm install"]
-
-[build.nixpacksPlan.phases.build]
-cmds = []
+cmds = ["npm install --omit=dev"]
 
 [deploy]
 startCommand = "node index.js"
