@@ -1,6 +1,6 @@
 "use strict";
 
-const utils = require('../../../utils'); 
+const utils = require('../../../utils');
 const mqtt = require('mqtt');
 const websocket = require('websocket-stream');
 const HttpsProxyAgent = require('https-proxy-agent');
@@ -46,7 +46,7 @@ function connectLightspeed(ctx, globalCallback) {
             pack: [],
             a: ctx.globalOptions.userAgent,
         };
-        
+
         const queryParams = new URLSearchParams({
             'x-dgw-appid': '2220391788200892',
             'x-dgw-appversion': '0',
@@ -59,7 +59,7 @@ function connectLightspeed(ctx, globalCallback) {
             'x-dgw-deviceid': ctx.clientID
         });
         const host = `wss://gateway.facebook.com/ws/lightspeed?${queryParams.toString()}`;
-        
+
         const options = {
             clientId: 'mqttwsclient',
             protocolId: 'MQIsdp',
@@ -78,7 +78,7 @@ function connectLightspeed(ctx, globalCallback) {
             keepalive: 10,
             reconnectPeriod: 0
         };
-        
+
         if (ctx.globalOptions.proxy) {
             options.wsOptions.agent = new HttpsProxyAgent(ctx.globalOptions.proxy);
         }
@@ -93,31 +93,26 @@ function connectLightspeed(ctx, globalCallback) {
         }
 
         client.on('connect', () => {
-            utils.log("[Lightspeed] MQTT client connected.");
+            utils.log("[Lightspeed] Connected successfully.");
             retryCount = 0;
-
-            const topicsToSubscribe = ["/t_ms", "/orca_presence", "/messaging_events"];
-            topicsToSubscribe.forEach(topic => {
+            ["/t_ms", "/orca_presence", "/messaging_events"].forEach(topic => {
                 client.subscribe(topic, (err) => {
-                    if (err) utils.error(`[Lightspeed] Failed to subscribe to ${topic}:`, err.message);
-                    else utils.log(`[Lightspeed] Subscribed to: ${topic}`);
+                    if (err) utils.error(`[Lightspeed] Subscribe failed ${topic}:`, err.message);
                 });
             });
         });
 
         client.on('message', (topic, payload) => {
-            globalCallback(null, { type: 'lightspeed_message', topic: topic.toString(), payload: payload });
+            globalCallback(null, { type: 'lightspeed_message', topic: topic.toString(), payload });
         });
 
         client.on('close', () => {
             utils.warn(`[Lightspeed] Connection closed.`);
-            if (!isStopped) {
-                reconnect(retryCount + 1);
-            }
+            if (!isStopped) reconnect(retryCount + 1);
         });
 
         client.on('error', (err) => {
-            utils.error("[Lightspeed] MQTT Connection Error:", err.message);
+            utils.error("[Lightspeed] Error:", err.message);
         });
     }
 
@@ -128,17 +123,15 @@ function connectLightspeed(ctx, globalCallback) {
             return;
         }
         const delay = Math.min(6000 * Math.pow(2, retryCount - 1), 60000);
-        utils.log(`[Lightspeed] Reconnecting in ${delay / 1000} seconds...`);
+        utils.log(`[Lightspeed] Reconnecting in ${delay / 1000}s...`);
         setTimeout(() => startConnection(retryCount), delay);
     }
 
     startConnection();
-
     return {
         stop: () => {
             isStopped = true;
             if (client) client.end(true);
-            utils.log("[Lightspeed] Listener has been manually stopped.");
         }
     };
 }
@@ -151,9 +144,7 @@ module.exports = function (defaultFuncs, api, ctx) {
                 this.listener = null;
             }
             stop() {
-                if (this.listener) {
-                    this.listener.stop();
-                }
+                if (this.listener) this.listener.stop();
                 this.emit('stop');
             }
         }
