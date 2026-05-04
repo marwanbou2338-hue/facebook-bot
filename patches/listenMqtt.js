@@ -28,10 +28,6 @@ function getRandomReconnectTime() {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function calculate(previousTimestamp, currentTimestamp){
-    return Math.floor(previousTimestamp + (currentTimestamp - previousTimestamp) + 300);
-}
-
 function markAsRead(ctx, api, threadID) {
     if (ctx.globalOptions.autoMarkRead && threadID) {
         api.markAsRead(threadID, (err) => {
@@ -46,7 +42,7 @@ async function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
     const foreground = false;
     const sessionID = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER) + 1;
 
-    // Always generate a fresh clientID for each connection attempt to avoid bans
+    // Always generate a fresh clientID for each connection attempt
     if (!ctx.clientID) ctx.clientID = generateUUID();
     const cid = ctx.clientID;
 
@@ -101,7 +97,7 @@ async function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
         keepalive: 10,
         reschedulePings: true,
         connectTimeout: 30000,
-        reconnectPeriod: 0  // Disable MQTT-level auto-reconnect — we handle it ourselves
+        reconnectPeriod: 0  // We handle reconnection ourselves
     };
 
     if (ctx.globalOptions.proxy) options.wsOptions.agent = new HttpsProxyAgent(ctx.globalOptions.proxy);
@@ -109,11 +105,8 @@ async function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
     const mqttClient = new mqtt.Client(_ => websocket(host, options.wsOptions), options);
     mqttClient.publishSync = mqttClient.publish.bind(mqttClient);
     mqttClient.publish = (topic, message, opts = {}, callback = () => {}) => new Promise((resolve, reject) => {
-            mqttClient.publishSync(topic, message, opts, (err, data) => {
-            if (err) {
-                callback(err);
-                reject(err);
-            }
+        mqttClient.publishSync(topic, message, opts, (err, data) => {
+            if (err) { callback(err); reject(err); }
             callback(null, data);
             resolve(data);
         });
@@ -127,7 +120,6 @@ async function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
         utils.error("listenMqtt", err);
         try { mqttClient.end(true); } catch (_) {}
         if (ctx.globalOptions.autoReconnect) {
-            // Regenerate clientID before retrying
             ctx.clientID = generateUUID();
             setTimeout(() => getSeqID(), 5000);
         } else {
@@ -135,13 +127,15 @@ async function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
         }
     });
 
-    mqttClient.on('close', () => {
-        if (errorHandled) return;
-    });
-
     mqttClient.on('connect', async () => {
         topics.forEach(topic => mqttClient.subscribe(topic));
-        const queue = { sync_api_version: 10, max_deltas_able_to_process: 1000, delta_batch_size: 500, encoding: "JSON", entity_fbid: ctx.userID };
+        const queue = {
+            sync_api_version: 10,
+            max_deltas_able_to_process: 1000,
+            delta_batch_size: 500,
+            encoding: "JSON",
+            entity_fbid: ctx.userID
+        };
         let topic;
         if (ctx.syncToken) {
             topic = "/messenger_sync_get_diffs";
@@ -168,9 +162,7 @@ async function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
             if (mqttClient.connected) {
                 const presencePayload = utils.generatePresence(ctx.userID);
                 mqttClient.publish('/orca_presence', JSON.stringify({ "p": presencePayload }), (err) => {
-                    if (err) {
-                        utils.error("Failed to send presence update:", err);
-                    }
+                    if (err) utils.error("Failed to send presence update:", err);
                 });
             }
         }, 50000);
@@ -180,7 +172,7 @@ async function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
         try {
             const jsonMessage = JSON.parse(message.toString());
             if (topic === "/t_ms") {
-                if (jsonMessage.lastIssuedSeqId){
+                if (jsonMessage.lastIssuedSeqId) {
                     ctx.lastSeqId = parseInt(jsonMessage.lastIssuedSeqId);
                 }
                 if (jsonMessage.deltas) {
@@ -206,6 +198,7 @@ async function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
 module.exports = (defaultFuncs, api, ctx) => {
     let globalCallback = () => {};
     let reconnectInterval;
+
     getSeqID = async () => {
         const DOC_IDS = [
             "6234794069933226",
@@ -230,9 +223,11 @@ module.exports = (defaultFuncs, api, ctx) => {
                         }
                     })
                 };
-                const resData = await defaultFuncs.post("https://www.facebook.com/api/graphqlbatch/", ctx.jar, form).then(utils.parseAndCheckLogin(ctx, defaultFuncs));
+                const resData = await defaultFuncs
+                    .post("https://www.facebook.com/api/graphqlbatch/", ctx.jar, form)
+                    .then(utils.parseAndCheckLogin(ctx, defaultFuncs));
                 if (utils.getType(resData) != "Array" || (resData.error && resData.error !== 1357001)) continue;
-                const sid = resData[0] && resData[0].o0 && resData[0].o0.data && resData[0].o0.data.viewer && resData[0].o0.data.viewer.message_threads && resData[0].o0.data.viewer.message_threads.sync_sequence_id;
+                const sid = resData[0]?.o0?.data?.viewer?.message_threads?.sync_sequence_id;
                 if (sid) { seqId = sid; break; }
             } catch (e) {
                 utils.error("[getSeqID] doc_id " + docId + " failed:", e && e.message);
@@ -242,7 +237,7 @@ module.exports = (defaultFuncs, api, ctx) => {
             ctx.lastSeqId = seqId;
             utils.log("[getSeqID] Got seqId:", seqId);
         } else {
-            utils.error("[getSeqID] All doc_ids failed. Using timestamp fallback — bot will only receive new messages.");
+            utils.error("[getSeqID] All doc_ids failed. Using timestamp fallback.");
             ctx.lastSeqId = String(Date.now());
         }
         listenMqtt(defaultFuncs, api, ctx, globalCallback);
@@ -304,7 +299,6 @@ module.exports = (defaultFuncs, api, ctx) => {
         }
 
         scheduleReconnect();
-
         return msgEmitter;
     };
 };
