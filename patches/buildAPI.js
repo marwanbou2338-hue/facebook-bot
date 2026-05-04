@@ -2,24 +2,13 @@
 
 const utils = require('../../utils');
 
-/**
- * Builds the core API context and default functions after successful login.
- *
- * @param {string} html The HTML body from the initial Facebook page.
- * @param {object} jar The cookie jar.
- * @param {Array<object>} netData Network data extracted from the HTML.
- * @param {object} globalOptions The global options object.
- * @param {function} fbLinkFunc A function to generate Facebook links.
- * @param {string} errorRetrievingMsg The error message for retrieving user ID.
- * @returns {Array<object>} An array containing [ctx, defaultFuncs, {}].
- */
 async function buildAPI(html, jar, netData, globalOptions, fbLinkFunc, errorRetrievingMsg) {
     let userID;
-    const cookies = jar.getCookiesSync(fbLinkFunc()); // Use passed fbLinkFunc
+    const cookies = jar.getCookiesSync(fbLinkFunc());
     const primaryProfile = cookies.find((val) => val.cookieString().startsWith("c_user="));
     const secondaryProfile = cookies.find((val) => val.cookieString().startsWith("i_user="));
     if (!primaryProfile && !secondaryProfile) {
-        throw new Error(errorRetrievingMsg); // Use passed error message
+        throw new Error(errorRetrievingMsg);
     }
     userID = secondaryProfile?.cookieString().split("=")[1] || primaryProfile.cookieString().split("=")[1];
 
@@ -57,10 +46,10 @@ async function buildAPI(html, jar, netData, globalOptions, fbLinkFunc, errorRetr
     const userAppID = currentUserData ? currentUserData.APP_ID : undefined;
 
     let primaryAppID = userAppID || mqttAppID;
-
     let mqttEndpoint = mqttConfigData ? mqttConfigData.endpoint : undefined;
-
     let region = mqttEndpoint ? new URL(mqttEndpoint).searchParams.get("region")?.toUpperCase() : undefined;
+
+    // Try multiple patterns — Facebook changes their HTML format frequently
     const irisSeqIDMatch =
         html.match(/irisSeqID:"(\d+)"/) ||
         html.match(/"irisSeqId"\s*:\s*"(\d+)"/) ||
@@ -69,8 +58,10 @@ async function buildAPI(html, jar, netData, globalOptions, fbLinkFunc, errorRetr
         html.match(/,"sync_sequence_id":(\d+)/) ||
         html.match(/"currentCursor"\s*:\s*"(\d+)"/);
     const irisSeqID = irisSeqIDMatch ? irisSeqIDMatch[1] : null;
+
     if (irisSeqID) utils.log("[buildAPI] irisSeqID extracted:", irisSeqID);
-    else utils.warn("[buildAPI] irisSeqID not found in HTML — will fetch via getSeqID");
+    else utils.warn("[buildAPI] irisSeqID not found — will fetch via getSeqID");
+
     if (globalOptions.bypassRegion && mqttEndpoint) {
         const currentEndpoint = new URL(mqttEndpoint);
         currentEndpoint.searchParams.set('region', globalOptions.bypassRegion.toLowerCase());
@@ -82,9 +73,9 @@ async function buildAPI(html, jar, netData, globalOptions, fbLinkFunc, errorRetr
         userID,
         jar,
         clientID,
-        appID: primaryAppID, 
-        mqttAppID: mqttAppID, 
-        userAppID: userAppID, 
+        appID: primaryAppID,
+        mqttAppID: mqttAppID,
+        userAppID: userAppID,
         globalOptions,
         loggedIn: true,
         access_token: "NONE",
