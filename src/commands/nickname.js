@@ -46,7 +46,7 @@ async function setAll(args, ctx) {
   const text = args.join(" ").trim();
   if (!text) {
     ctx.api.sendMessage(
-      "اكتب الكنية. مثال: كنية تعيين 🌟 عضو",
+      "اكتب الكنية. مثال: -كنية تعيين 🌟 عضو",
       ctx.threadID,
       ctx.event.messageID
     );
@@ -71,13 +71,43 @@ async function setAll(args, ctx) {
     return;
   }
 
-  ctx.api.sendMessage(
-    `⏳ جاري تعيين الكنية لـ ${participants.length} عضو...`,
-    ctx.threadID,
-    ctx.event.messageID
-  );
+  try {
+    ctx.api.sendMessage(
+      `⏳ جاري تعيين الكنية لـ ${participants.length} عضو...\n• الكنية: ${text}`,
+      ctx.threadID,
+      ctx.event.messageID
+    );
+  } catch (e) {}
 
-  const { ok, fail } = await changeNicknamesBulk(ctx.api, text, ctx.threadID, participants);
+  const { changeNicknameSafe, sleep } = require("../fb-helpers");
+  let ok = 0;
+  let fail = 0;
+  const total = participants.length;
+  const PROGRESS_EVERY = Math.max(5, Math.floor(total / 4));
+
+  for (let i = 0; i < total; i++) {
+    const uid = String(participants[i]);
+    try {
+      await changeNicknameSafe(ctx.api, text, ctx.threadID, uid);
+      ok++;
+    } catch (e) {
+      fail++;
+      console.error(`[NICK-ALL] uid=${uid} فشل: ${e.message}`);
+    }
+
+    if (i < total - 1) {
+      await sleep(1200);
+    }
+
+    if (total > 10 && (i + 1) % PROGRESS_EVERY === 0 && i + 1 < total) {
+      try {
+        ctx.api.sendMessage(
+          `🔄 التقدم: ${i + 1}/${total} — نجح: ${ok} | فشل: ${fail}`,
+          ctx.threadID
+        );
+      } catch (e) {}
+    }
+  }
 
   if (ok > 0) {
     const n = stateMod.getNickState(ctx.threadID);
@@ -88,7 +118,7 @@ async function setAll(args, ctx) {
   }
 
   ctx.api.sendMessage(
-    `${ok > 0 ? "✓" : "✗"} نتيجة تعيين الكنية\n• الكنية: ${text}\n• نجح: ${ok}\n• فشل: ${fail}`,
+    `${ok > 0 ? "✓" : "✗"} انتهى تعيين الكنيات\n• الكنية: ${text}\n• نجح: ${ok}/${total}\n• فشل: ${fail}`,
     ctx.threadID,
     ctx.event.messageID
   );
